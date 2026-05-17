@@ -4,5 +4,48 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  STORE_OWNER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(60)
+  email     String   @unique @db.VarChar(255)
+  password  String
+  address   String   @db.VarChar(400)
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  stores  Store[]
+  ratings Rating[]
+}
+
+model Store {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(60)
+  email     String   @db.VarChar(255)
+  address   String   @db.VarChar(400)
+  ownerId   Int
+  createdAt DateTime @default(now())
+
+  owner   User     @relation(fields: [ownerId], references: [id])
+  ratings Rating[]
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  userId    Int
+  storeId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  store Store @relation(fields: [storeId], references: [id])
+
+  @@unique([userId, storeId])
 }
