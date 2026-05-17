@@ -25,6 +25,7 @@ export class StoresService {
             name: true,
           },
         },
+        ratings: true,
       },
     });
   }
@@ -39,6 +40,7 @@ export class StoresService {
             name: true,
           },
         },
+        ratings: true,
       },
     });
 
