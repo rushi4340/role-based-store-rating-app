@@ -140,14 +140,17 @@ const AdminDashboard = () => {
       {/* Stores Table */}
       <div style={{marginTop: '4rem', marginBottom: '4rem'}}>
         <h2>Manage Stores</h2>
-        <div style={{display: 'flex', gap: '1rem', marginBottom: '1rem'}}>
+        <div style={{display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap'}}>
           <input 
             type="text" 
             placeholder="Search Name/Address..." 
             value={storeSearch}
             onChange={(e) => setStoreSearch(e.target.value)}
-            style={{flex: 1}}
+            style={{flex: 1, minWidth: '200px'}}
           />
+          <Link to="/create-store" className="btn btn-primary" style={{whiteSpace: 'nowrap'}}>
+            + Add New Store
+          </Link>
         </div>
         
         <div className="store-card" style={{overflowX: 'auto'}}>
