@@ -11,9 +11,27 @@ const AdminDashboard = () => {
   // Filters for users
   const [userSearch, setUserSearch] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [userSortConfig, setUserSortConfig] = useState({ key: 'name', direction: 'asc' });
 
   // Filters for stores
   const [storeSearch, setStoreSearch] = useState('');
+  const [storeSortConfig, setStoreSortConfig] = useState({ key: 'name', direction: 'asc' });
+
+  const handleUserSort = (key) => {
+    let direction = 'asc';
+    if (userSortConfig.key === key && userSortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setUserSortConfig({ key, direction });
+  };
+
+  const handleStoreSort = (key) => {
+    let direction = 'asc';
+    if (storeSortConfig.key === key && storeSortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setStoreSortConfig({ key, direction });
+  };
 
   useEffect(() => {
     fetchStats();
@@ -67,6 +85,33 @@ const AdminDashboard = () => {
     return (sum / ratings.length).toFixed(1);
   };
 
+  const sortedUsers = [...users].sort((a, b) => {
+    let valA = a[userSortConfig.key];
+    let valB = b[userSortConfig.key];
+    if (userSortConfig.key === 'storeRating') {
+      valA = a.storeRating || 0;
+      valB = b.storeRating || 0;
+    }
+    if (valA < valB) return userSortConfig.direction === 'asc' ? -1 : 1;
+    if (valA > valB) return userSortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const sortedStores = [...stores].sort((a, b) => {
+    let valA = a[storeSortConfig.key];
+    let valB = b[storeSortConfig.key];
+    if (storeSortConfig.key === 'ownerName') {
+        valA = a.owner?.name || '';
+        valB = b.owner?.name || '';
+    } else if (storeSortConfig.key === 'avgRating') {
+        valA = parseFloat(calculateAverageRating(a.ratings));
+        valB = parseFloat(calculateAverageRating(b.ratings));
+    }
+    if (valA < valB) return storeSortConfig.direction === 'asc' ? -1 : 1;
+    if (valA > valB) return storeSortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   if (loading && users.length === 0) return <div className="container" style={{paddingTop: '3rem'}}>Loading admin dashboard...</div>;
 
   return (
@@ -115,15 +160,25 @@ const AdminDashboard = () => {
           <table style={{width: '100%', textAlign: 'left', borderCollapse: 'collapse'}}>
             <thead>
               <tr style={{borderBottom: '1px solid var(--border-color)'}}>
-                <th style={{padding: '1rem 0.5rem'}}>Name</th>
-                <th style={{padding: '1rem 0.5rem'}}>Email</th>
-                <th style={{padding: '1rem 0.5rem'}}>Role</th>
-                <th style={{padding: '1rem 0.5rem'}}>Address</th>
-                <th style={{padding: '1rem 0.5rem'}}>Store Rating</th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleUserSort('name')}>
+                  Name {userSortConfig.key === 'name' ? (userSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleUserSort('email')}>
+                  Email {userSortConfig.key === 'email' ? (userSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleUserSort('role')}>
+                  Role {userSortConfig.key === 'role' ? (userSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleUserSort('address')}>
+                  Address {userSortConfig.key === 'address' ? (userSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleUserSort('storeRating')}>
+                  Store Rating {userSortConfig.key === 'storeRating' ? (userSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {users.map(u => (
+              {sortedUsers.map(u => (
                 <tr key={u.id} style={{borderBottom: '1px solid var(--border-color)'}}>
                   <td style={{padding: '1rem 0.5rem'}}>{u.name}</td>
                   <td style={{padding: '1rem 0.5rem'}}>{u.email}</td>
@@ -157,14 +212,22 @@ const AdminDashboard = () => {
           <table style={{width: '100%', textAlign: 'left', borderCollapse: 'collapse'}}>
             <thead>
               <tr style={{borderBottom: '1px solid var(--border-color)'}}>
-                <th style={{padding: '1rem 0.5rem'}}>Store Name</th>
-                <th style={{padding: '1rem 0.5rem'}}>Owner</th>
-                <th style={{padding: '1rem 0.5rem'}}>Address</th>
-                <th style={{padding: '1rem 0.5rem'}}>Avg Rating</th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleStoreSort('name')}>
+                  Store Name {storeSortConfig.key === 'name' ? (storeSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleStoreSort('ownerName')}>
+                  Owner {storeSortConfig.key === 'ownerName' ? (storeSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleStoreSort('address')}>
+                  Address {storeSortConfig.key === 'address' ? (storeSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th style={{padding: '1rem 0.5rem', cursor: 'pointer'}} onClick={() => handleStoreSort('avgRating')}>
+                  Avg Rating {storeSortConfig.key === 'avgRating' ? (storeSortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {stores.map(s => (
+              {sortedStores.map(s => (
                 <tr key={s.id} style={{borderBottom: '1px solid var(--border-color)'}}>
                   <td style={{padding: '1rem 0.5rem'}}>{s.name}</td>
                   <td style={{padding: '1rem 0.5rem'}}>{s.owner?.name}</td>
