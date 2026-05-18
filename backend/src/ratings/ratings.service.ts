@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 
@@ -18,23 +18,18 @@ export class RatingsService {
       throw new NotFoundException(`Store with ID ${storeId} not found`);
     }
 
-    // 2. Check if the user already rated this store
-    const existingRating = await this.prisma.rating.findUnique({
+    // 2. Upsert the rating (Create if not exists, Update if exists)
+    return this.prisma.rating.upsert({
       where: {
         userId_storeId: {
           userId,
           storeId,
         },
       },
-    });
-
-    if (existingRating) {
-      throw new ConflictException('You have already rated this store');
-    }
-
-    // 3. Create the rating
-    return this.prisma.rating.create({
-      data: {
+      update: {
+        rating,
+      },
+      create: {
         rating,
         storeId,
         userId,

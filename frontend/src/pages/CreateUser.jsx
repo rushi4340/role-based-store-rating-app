@@ -1,20 +1,20 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import './Auth.css';
 
-const Signup = () => {
+const CreateUser = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     address: '',
-    role: 'USER' // Default role
+    role: 'USER'
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -24,28 +24,44 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setIsLoading(true);
 
-    const result = await signup(formData);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.message);
+    try {
+      // We can use the signup endpoint since it does exactly what we need
+      // (creating a user with a role). 
+      // Wait, signup logs the user in on the backend context?
+      // No, signup returns the user. Our AuthContext signup logs them in.
+      // So we must use the raw api call so the admin doesn't get logged out!
+      await api.post('/auth/signup', formData);
+      setSuccess('User created successfully!');
+      setFormData({
+        name: '', email: '', password: '', address: '', role: 'USER'
+      });
+      setTimeout(() => navigate('/'), 2000);
+    } catch (err) {
+      let message = 'Failed to create user';
+      if (err.response?.data?.message) {
+        message = Array.isArray(err.response.data.message) 
+          ? err.response.data.message[0] 
+          : err.response.data.message;
+      }
+      setError(message);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
-    <div className="auth-container animate-fade-in">
-      <div className="auth-card signup-card">
+    <div className="container" style={{ paddingTop: '3rem' }}>
+      <div className="auth-card" style={{ margin: '0 auto', maxWidth: '500px' }}>
         <div className="auth-header">
-          <h2>Create an Account</h2>
-          <p>Join StoreRate to review your favorite stores</p>
+          <h2>Create New User</h2>
+          <p>Add a new User, Store Owner, or Admin to the system</p>
         </div>
 
         {error && <div className="auth-error">{error}</div>}
+        {success && <div className="success-banner">{success}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -69,7 +85,7 @@ const Signup = () => {
               id="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="you@example.com"
+              placeholder="user@example.com"
               required
             />
           </div>
@@ -102,28 +118,34 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">I am a...</label>
+            <label htmlFor="role">User Role</label>
             <select id="role" value={formData.role} onChange={handleChange}>
-              <option value="USER">Customer (Rate Stores)</option>
-              <option value="STORE_OWNER">Store Owner (Manage Stores)</option>
+              <option value="USER">Normal User</option>
+              <option value="STORE_OWNER">Store Owner</option>
+              <option value="ADMIN">System Administrator</option>
             </select>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary auth-btn"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating account...' : 'Create Account'}
-          </button>
+          <div className="auth-buttons" style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+            <button 
+              type="button" 
+              className="btn btn-secondary full-width"
+              onClick={() => navigate('/')}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="btn btn-primary full-width"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating...' : 'Create User'}
+            </button>
+          </div>
         </form>
-
-        <div className="auth-footer">
-          <p>Already have an account? <Link to="/login">Sign in</Link></p>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default CreateUser;

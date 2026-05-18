@@ -59,9 +59,10 @@ const CreateStore = () => {
               id="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. Super Mart"
+              placeholder="e.g. Super Mart (Min 20 chars)"
               required
-              minLength="3"
+              minLength="20"
+              maxLength="60"
             />
           </div>
 

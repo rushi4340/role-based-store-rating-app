@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
@@ -20,8 +20,15 @@ export class StoresController {
 
   // Public route - anyone can view stores
   @Get()
-  findAll() {
-    return this.storesService.findAll();
+  findAll(@Query() query: any) {
+    return this.storesService.findAll(query);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('STORE_OWNER')
+  @Get('owner/dashboard')
+  getOwnerDashboard(@CurrentUser() user: any) {
+    return this.storesService.getOwnerDashboard(user.sub);
   }
 
   // Public route

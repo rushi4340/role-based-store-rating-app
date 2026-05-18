@@ -2,7 +2,7 @@ import { IsEmail, IsString, MaxLength, MinLength, IsOptional } from 'class-valid
 
 export class CreateStoreDto {
   @IsString()
-  @MinLength(3, { message: 'Store name must be at least 3 characters' })
+  @MinLength(20, { message: 'Store name must be at least 20 characters' })
   @MaxLength(60, { message: 'Store name cannot exceed 60 characters' })
   name: string;
 

@@ -18,10 +18,21 @@ const StoreDetails = () => {
   const [ratingError, setRatingError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [hasRated, setHasRated] = useState(false);
 
   useEffect(() => {
     fetchStoreDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (store && user && store.ratings) {
+      const existingRating = store.ratings.find(r => r.userId === user.id);
+      if (existingRating) {
+        setRating(existingRating.rating);
+        setHasRated(true);
+      }
+    }
+  }, [store, user]);
 
   const fetchStoreDetails = async () => {
     try {
@@ -46,7 +57,8 @@ const StoreDetails = () => {
         storeId: parseInt(id),
         rating: parseInt(rating)
       });
-      setSuccessMsg('Rating submitted successfully!');
+      setSuccessMsg(hasRated ? 'Rating updated successfully!' : 'Rating submitted successfully!');
+      setHasRated(true);
       fetchStoreDetails(); // Refresh to get new average
     } catch (err) {
       let msg = 'Failed to submit rating';
@@ -133,7 +145,7 @@ const StoreDetails = () => {
                 className="btn btn-primary"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Rating'}
+                {isSubmitting ? 'Submitting...' : (hasRated ? 'Update Rating' : 'Submit Rating')}
               </button>
             </form>
           )}
