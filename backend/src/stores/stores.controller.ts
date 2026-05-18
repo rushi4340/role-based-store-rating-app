@@ -15,7 +15,7 @@ export class StoresController {
   @Roles('ADMIN', 'STORE_OWNER')
   @Post()
   create(@Body() createStoreDto: CreateStoreDto, @CurrentUser() user: any) {
-    return this.storesService.create(createStoreDto, user.sub);
+    return this.storesService.create(createStoreDto, user.sub, user.role);
   }
 
   // Public route - anyone can view stores

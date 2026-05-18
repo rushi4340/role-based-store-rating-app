@@ -7,11 +7,16 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 export class StoresService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createStoreDto: CreateStoreDto, userId: number) {
+  async create(createStoreDto: CreateStoreDto & { ownerId?: string | number }, userId: number, userRole?: string) {
+    const { ownerId, ...storeData } = createStoreDto;
+    
+    // If admin is creating it and specified an ownerId, use it. Otherwise, fallback to the creator's ID.
+    const finalOwnerId = (userRole === 'ADMIN' && ownerId) ? Number(ownerId) : userId;
+
     return this.prisma.store.create({
       data: {
-        ...createStoreDto,
-        ownerId: userId,
+        ...storeData,
+        ownerId: finalOwnerId,
       },
     });
   }

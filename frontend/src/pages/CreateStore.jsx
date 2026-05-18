@@ -1,18 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Auth.css'; // Reusing auth styles for forms
 
 const CreateStore = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     address: '',
+    ownerId: '',
   });
+  const [owners, setOwners] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAdmin) {
+      api.get('/users?role=STORE_OWNER')
+        .then(res => setOwners(res.data))
+        .catch(err => console.error('Failed to fetch owners:', err));
+    }
+  }, [isAdmin]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -91,6 +105,23 @@ const CreateStore = () => {
               rows="3"
             />
           </div>
+
+          {isAdmin && (
+            <div className="form-group">
+              <label htmlFor="ownerId">Assign Store Owner (Optional)</label>
+              <select 
+                id="ownerId" 
+                value={formData.ownerId} 
+                onChange={handleChange}
+                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--border-color)' }}
+              >
+                <option value="">Assign to myself (Admin)</option>
+                {owners.map(owner => (
+                  <option key={owner.id} value={owner.id}>{owner.name} ({owner.email})</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="auth-buttons" style={{ marginTop: '1.5rem' }}>
             <button 
