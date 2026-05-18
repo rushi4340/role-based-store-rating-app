@@ -71,9 +71,9 @@ const CreateUser = () => {
               id="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Full Name (Min 20 chars)"
+              placeholder="Full Name"
               required
-              minLength="20"
+              minLength="3"
               maxLength="60"
             />
           </div>

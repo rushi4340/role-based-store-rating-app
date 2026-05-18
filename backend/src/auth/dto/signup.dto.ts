@@ -3,7 +3,7 @@ import { Role } from '@prisma/client';
 
 export class SignupDto {
   @IsString()
-  @MinLength(20, { message: 'Name must be at least 20 characters' })
+  @MinLength(3, { message: 'Name must be at least 3 characters' })
   @MaxLength(60, { message: 'Name cannot exceed 60 characters' })
   name: string;
 
