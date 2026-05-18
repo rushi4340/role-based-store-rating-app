@@ -87,6 +87,7 @@ const CreateStore = () => {
               placeholder="123 Main St, City"
               required
               minLength="10"
+              maxLength="400"
               rows="3"
             />
           </div>
