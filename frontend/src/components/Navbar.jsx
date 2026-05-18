@@ -9,7 +9,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container navbar-content">
         <Link to="/" className="navbar-brand">
-          <span className="text-primary">Store</span>Rate
+          StoreRate
         </Link>
 
         <div className="navbar-links">
