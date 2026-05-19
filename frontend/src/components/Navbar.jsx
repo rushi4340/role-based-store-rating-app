@@ -9,7 +9,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container navbar-content">
         <Link to="/" className="navbar-brand">
-          StoreRate
+          Store Rating app
         </Link>
 
         <div className="navbar-links">
@@ -17,7 +17,7 @@ const Navbar = () => {
             <div className="user-menu">
               <span className="user-badge">{user.role}</span>
               <span className="user-name">Hi, {user.name}</span>
-              <Link to="/change-password" className="btn btn-secondary btn-sm" style={{background: 'transparent', border: '1px solid var(--border-color)'}}>
+              <Link to="/change-password" className="btn btn-secondary btn-sm" style={{ background: 'transparent', border: '1px solid var(--border-color)' }}>
                 Change Password
               </Link>
               <button onClick={logout} className="btn btn-secondary btn-sm">

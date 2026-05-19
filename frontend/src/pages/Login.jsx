@@ -8,7 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -18,13 +18,13 @@ const Login = () => {
     setIsLoading(true);
 
     const result = await login(email, password);
-    
+
     if (result.success) {
       navigate('/');
     } else {
       setError(result.message);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -39,9 +39,9 @@ const Login = () => {
         {error && <div className="auth-error">{error}</div>}
 
         <div style={{ backgroundColor: 'var(--surface-hover)', padding: '1rem', borderRadius: 'var(--border-radius-sm)', marginBottom: '1.5rem', fontSize: '0.875rem', border: '1px solid var(--border-color)' }}>
-          <strong>Recruiter Note:</strong> To test System Administrator features, you can log in with:
-          <br/>Email: <strong>admin@test.com</strong>
-          <br/>Password: <strong>Admin@1234!</strong>
+          <strong>For testing :</strong> To test System Administrator features, you can log in with:
+          <br />Email: <strong>admin@test.com</strong>
+          <br />Password: <strong>Admin@1234!</strong>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -69,8 +69,8 @@ const Login = () => {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary auth-btn"
             disabled={isLoading}
           >
